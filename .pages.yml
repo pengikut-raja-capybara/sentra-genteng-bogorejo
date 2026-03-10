@@ -1,0 +1,105 @@
+media:
+  input: public/assets/uploads
+  output: /assets/uploads
+  categories: ["image"]
+
+content:
+  # KOLEKSI 1: RUMAH PRODUKSI (Data Pengrajin)
+  - name: rumah_produksi
+    label: "Rumah Produksi"
+    type: collection
+    path: content/rumah_produksi
+    format: json
+    view:
+      fields: [
+          rmp_id
+          rmp_id,
+          rmp_nama,
+          rmp_alamat,
+          rmp_kapasitas_cetak,
+          rmp_kapasitas_tungku,
+          rmp_pekerja,
+          rmp_stok_dormant,
+        ]
+    fields:
+      - { name: rmp_id, label: ID, type: uuid, options: { editable: false } }
+      - {
+          name: rmp_nama,
+          label: "Nama Pemilik / Pengrajin",
+          type: string,
+          required: true,
+        }
+      - { name: rmp_alamat, label: "Alamat Lengkap", type: string }
+      - { name: rmp_kontak, label: "Nomor Kontak Pengrajin", type: string }
+      - {
+          name: rmp_kapasitas_cetak,
+          label: "Kapasitas Cetak Rata-rata",
+          type: string,
+        }
+      - {
+          name: rmp_kapasitas_tungku,
+          label: "Kapasitas Tungku Pembakaran",
+          type: string,
+        }
+      - { name: rmp_pekerja, label: "Jumlah Pekerja Tambahan", type: text }
+      - {
+          name: rmp_stok_dormant,
+          label: "Rata-rata Stok Dormant",
+          type: string,
+        }
+      - {
+          name: rmp_image,
+          label: "Foto",
+          type: image,
+          options: { multiple: true },
+        }
+      - {
+          name: rmp_foto,
+          label: "Foto",
+          type: image,
+          options:
+            {
+              multiple: true,
+              path: rumah_produksi,
+              extensions: [jpg, png, webp],
+            },
+        }
+      - { name: rmp_custom_body, label: "Custom Deskripsi", type: rich-text }
+
+  # KOLEKSI 2: KATALOG PRODUK (Data Spesifikasi & Harga)
+  - name: katalog_produk
+    label: "Katalog Produk Genteng"
+    type: collection
+    path: content/produk
+    format: json
+    view:
+      fields: [prd_id, prd_image, prd_nama, prd_harga_eceran, prd_kebutuhan_m2]
+    fields:
+      - { name: prd_id, label: ID, type: uuid, options: { editable: false } }
+      - {
+          name: prd_nama,
+          label: "Jenis / Model Genteng",
+          type: string,
+          required: true,
+        }
+      - {
+          name: prd_spesifikasi,
+          label: "Spesifikasi Fisik Rata-rata",
+          type: text,
+          description: "Contoh: Ukuran, Berat, Bahan",
+        }
+      - {
+          name: prd_kebutuhan_m2,
+          label: "Kebutuhan per Meter Persegi (m2)",
+          type: string,
+        }
+      - { name: prd_harga_pengepul, label: "Harga Jual Pengepul", type: string }
+      - { name: prd_harga_eceran, label: "Harga Jual Eceran", type: string }
+      - {
+          name: prd_image,
+          label: "Foto",
+          type: image,
+          options:
+            { multiple: true, path: produk, extensions: [jpg, png, webp] },
+        }
+      - { name: prd_custom_body, label: "Custom Deskripsi", type: rich-text }
