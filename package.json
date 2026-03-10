@@ -1,0 +1,18 @@
+{
+  "name": "sentra-genteng-bogorejo",
+  "type": "module",
+  "private": false,
+  "scripts": {
+    "convert:webp": "bun run scripts/convert-webp.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "sharp": "^0.34.5",
+    "svgo": "^4.0.1"
+  }
+}
