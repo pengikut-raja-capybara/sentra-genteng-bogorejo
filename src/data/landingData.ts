@@ -87,7 +87,7 @@ export const valuePropositions: ValuePropositionItem[] = [
 ]
 
 export const contactDescription =
-  'Hubungi Manajer Operasional (Makelar Digital) kami untuk konsultasi kebutuhan proyek, negosiasi harga, dan pengaturan logistik.'
+  'Hubungi kami untuk konsultasi kebutuhan proyek, negosiasi harga, dan pengaturan logistik.'
 
 export const footerText =
   'Sentra Genteng Bogorejo, Kabupaten Magetan, Jawa Timur.'
