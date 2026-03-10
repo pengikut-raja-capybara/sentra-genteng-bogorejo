@@ -48,12 +48,6 @@ content:
           type: string,
         }
       - {
-          name: rmp_image,
-          label: "Foto",
-          type: image,
-          options: { multiple: true },
-        }
-      - {
           name: rmp_foto,
           label: "Foto",
           type: image,
