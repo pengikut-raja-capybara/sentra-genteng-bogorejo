@@ -4,6 +4,7 @@ import type {
   HeroContent,
   NavItem,
   Product,
+  CreatorCredit,
   ValuePropositionItem,
 } from '../types/landing'
 
@@ -94,3 +95,22 @@ export const footerText =
 
 export const footerKeywords =
   'genteng murah | produsen genteng magetan | sentra genteng bogorejo | supplier genteng jawa timur'
+
+export const footerCreditPrefix = 'Dibuat oleh '
+
+export const footerCreditLabel = 'Mahasiswa Universitas Siber Asia'
+
+export const footerCreators: CreatorCredit[] = [
+  {
+    name: 'ANGGA ALFIANSAH',
+    identifier: '240101010032',
+  },
+  {
+    name: 'RISSQI AGUNG RAHMADANI',
+    identifier: '240101010038',
+  },
+  {
+    name: 'RAJA CAPYBARA YANG BERBUDI LUHUR',
+    identifier: '-',
+  },
+]

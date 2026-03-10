@@ -16,6 +16,9 @@ import {
   contactDescription,
   footerText,
   footerKeywords,
+  footerCreditPrefix,
+  footerCreditLabel,
+  footerCreators,
 } from './data/landingData'
 
 function App() {
@@ -37,7 +40,13 @@ function App() {
         />
       </main>
 
-      <FooterSection text={footerText} keywords={footerKeywords} />
+      <FooterSection
+        text={footerText}
+        keywords={footerKeywords}
+        creditPrefix={footerCreditPrefix}
+        creditLabel={footerCreditLabel}
+        creators={footerCreators}
+      />
     </div>
   )
 }
