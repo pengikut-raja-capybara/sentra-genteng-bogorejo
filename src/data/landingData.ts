@@ -111,6 +111,6 @@ export const footerCreators: CreatorCredit[] = [
   },
   {
     name: 'RAJA CAPYBARA YANG BERBUDI LUHUR',
-    identifier: '-',
+    identifier: '',
   },
 ]
