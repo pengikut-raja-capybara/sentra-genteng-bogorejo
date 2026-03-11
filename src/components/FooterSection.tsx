@@ -1,13 +1,77 @@
-type FooterSectionProps = {
-  text: string
-  keywords: string
-}
+import { useEffect, useState } from "react";
+import type { CreatorCredit } from "../types/landing";
 
-export function FooterSection({ text, keywords }: FooterSectionProps) {
+type FooterSectionProps = {
+  text: string;
+  keywords: string;
+  creditPrefix: string;
+  creditLabel: string;
+  creators: CreatorCredit[];
+};
+
+export function FooterSection({ text, keywords, creditPrefix, creditLabel, creators }: FooterSectionProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const { overflow } = document.body.style;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = overflow;
+    };
+  }, [isOpen]);
+
   return (
-    <footer className="mt-5 rounded-2xl bg-[#221d1a] p-4 text-[#fff9f0]">
-      <p>{text}</p>
-      <p className="mt-2 text-sm text-[#f0d7b8]">{keywords}</p>
-    </footer>
-  )
+    <>
+      <footer className="mt-5 rounded-2xl bg-[#221d1a] p-4 text-[#fff9f0]">
+        <p>{text}</p>
+        <p className="mt-2 text-sm text-[#f0d7b8]">{keywords}</p>
+        <p className="mt-3 text-sm text-[#f4eadc]">
+          {creditPrefix}
+          <button type="button" onClick={() => setIsOpen(true)} className="font-semibold text-[#ffd8a8] underline decoration-[#d66a1f]/70 underline-offset-4 transition hover:text-white">
+            {creditLabel}
+          </button>
+        </p>
+      </footer>
+
+      {isOpen ? (
+        <div role="presentation" onClick={() => setIsOpen(false)} className="fixed inset-0 z-40 grid place-items-center bg-black/60 p-4 animate-[fade-in_0.24s_ease-out]">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="credit-title"
+            className="w-full max-w-[28em] rounded-xl bg-[#fffdf8] p-2 text-[#1f1a17] shadow-[0_1em_2.8em_rgba(0,0,0,0.35)] animate-[modal-enter_0.28s_cubic-bezier(0.2,0.9,0.25,1)]"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="rounded-xl border border-[#e2d8c8] bg-[#fff9ef] p-3">
+              <p className="text-lg font-semibold">Sentra Genteng Bogorejo</p>
+              <p className="mt-1 text-sm text-[#4d443d]">Proyek ini adalah eksperimen untuk digitalisasi kerajinan genteng di desa Bogorejo, Magetan, Jawa Timur.</p>
+              <p className="mt-3 text-md font-semibold">Dibuat dengan dedikasi oleh:</p>
+              <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-[#2a241f]">
+                {creators.map((creator) => (
+                  <li key={`${creator.name}-${creator.identifier}`}>
+                    <span className="font-semibold">{creator.name}</span>
+                    <span className="ml-2 text-[#5a5149]">{creator.identifier ? `(${creator.identifier})` : ""}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
+  );
 }

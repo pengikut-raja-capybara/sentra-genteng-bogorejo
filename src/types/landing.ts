@@ -33,3 +33,8 @@ export type ValuePropositionItem = {
   title: string
   description: string
 }
+
+export type CreatorCredit = {
+  name: string
+  identifier: string
+}
