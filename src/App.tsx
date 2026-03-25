@@ -31,6 +31,64 @@ import {
 
 const normalizeText = (value: string) => value.replace(/\s+/g, ' ').trim()
 
+const formatNumberId = (value: number) => new Intl.NumberFormat('id-ID').format(value)
+
+const parseCapacityRange = (rawValue: string): { min: number; max: number } | null => {
+  const normalizedValue = normalizeText(rawValue)
+    .replace(/\s*\/\s*bulan\b/gi, '')
+    .replace(/\bper\s+bulan\b/gi, '')
+    .replace(/\s+sampai\s+/gi, '-')
+    .replace(/\s*(?:-|–|—|~|to)\s*/gi, '-')
+
+  const numberTokens = normalizedValue.match(/\d[\d.,]*/g)
+
+  if (!numberTokens || numberTokens.length === 0) {
+    return null
+  }
+
+  const toNumber = (token: string) => Number(token.replace(/\D/g, ''))
+  const firstNumber = toNumber(numberTokens[0])
+  const secondNumber = numberTokens[1] ? toNumber(numberTokens[1]) : firstNumber
+
+  if (!Number.isFinite(firstNumber) || !Number.isFinite(secondNumber)) {
+    return null
+  }
+
+  return {
+    min: Math.min(firstNumber, secondNumber),
+    max: Math.max(firstNumber, secondNumber),
+  }
+}
+
+const summarizeMonthlyMoldingCapacity = (productionHouses: ProductionHouseContent[]) => {
+  const totals = productionHouses.reduce(
+    (accumulator, house) => {
+      const parsedRange = parseCapacityRange(house.moldingCapacity)
+
+      if (!parsedRange) {
+        return accumulator
+      }
+
+      return {
+        min: accumulator.min + parsedRange.min,
+        max: accumulator.max + parsedRange.max,
+        count: accumulator.count + 1,
+      }
+    },
+    { min: 0, max: 0, count: 0 },
+  )
+
+  if (totals.count === 0) {
+    return null
+  }
+
+  if (totals.min === totals.max) {
+    return `${formatNumberId(totals.min)}`
+  }
+
+  return `${formatNumberId(totals.min)}-${formatNumberId(totals.max)}`
+}
+
 const mapFallbackProductToProductContent = (
   item: (typeof fallbackProducts)[number],
   index: number,
@@ -52,17 +110,26 @@ const mapFallbackProductToProductContent = (
 const mapCapacityWithProductionHouseCount = (
   baseMetrics: CapacityMetric[],
   productionHouseCount: number,
+  moldingCapacitySummary: string | null,
 ): CapacityMetric[] => {
   return baseMetrics.map((metric, index) => {
-    if (index !== 0) {
-      return metric
+    if (index === 0) {
+      return {
+        ...metric,
+        value: `${productionHouseCount}+`,
+        detail: "Jaringan pengrajin aktif dan terkoordinasi",
+      }
     }
 
-    return {
-      ...metric,
-      value: `${productionHouseCount}+`,
-      detail: `${productionHouseCount} rumah produksi aktif terdeteksi dari CMS`,
+    if (index === 1 && moldingCapacitySummary) {
+      return {
+        ...metric,
+        value: moldingCapacitySummary,
+        detail: 'Akumulasi kapasitas cetak bulanan',
+      }
     }
+
+    return metric
   })
 }
 
@@ -93,11 +160,14 @@ function App() {
         }
 
         if (productionHouseList.length > 0) {
+          const moldingCapacitySummary = summarizeMonthlyMoldingCapacity(productionHouseList)
+
           setProductionHouses(productionHouseList)
           setCapacityMetrics(
             mapCapacityWithProductionHouseCount(
               fallbackCapacityMetrics,
               productionHouseList.length,
+              moldingCapacitySummary,
             ),
           )
         }

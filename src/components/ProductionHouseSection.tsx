@@ -131,11 +131,11 @@ export function ProductionHouseSection({ productionHouses }: ProductionHouseSect
                 <p className="text-sm text-[#5f5145]">{normalizeText(item.address)}</p>
                 <div className="grid gap-2 text-sm text-[#4d443d] sm:grid-cols-2">
                   <p className="rounded-lg border border-[#ead6bb] bg-[#fff8eb] [padding:0.45em_0.7em]">
-                    <span className="font-semibold text-[#7f451f]">Kapasitas Cetak:</span>{' '}
+                    <div className="font-semibold text-[#7f451f]">Kapasitas Cetak:</div>
                     {normalizeText(item.moldingCapacity)}
                   </p>
                   <p className="rounded-lg border border-[#ead6bb] bg-[#fff8eb] [padding:0.45em_0.7em]">
-                    <span className="font-semibold text-[#7f451f]">Kapasitas Tungku:</span>{' '}
+                    <div className="font-semibold text-[#7f451f]">Kapasitas Tungku:</div>
                     {normalizeText(item.furnaceCapacity)}
                   </p>
                 </div>
