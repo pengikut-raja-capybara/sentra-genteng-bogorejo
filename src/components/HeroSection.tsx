@@ -9,7 +9,7 @@ export function HeroSection({ content, contactInfo }: HeroSectionProps) {
   return (
     <section
       aria-labelledby="hero-title"
-      className="grid min-h-[23.75em] items-end overflow-hidden rounded-[1.75em] bg-[linear-gradient(112deg,rgba(20,16,13,0.93)_16%,rgba(20,16,13,0.68)_58%,rgba(20,16,13,0.4)_100%),radial-gradient(circle_at_86%_18%,rgba(214,106,31,0.34),transparent_52%),#2f2a26] p-8 text-[#fffef9] shadow-[0_0.875em_2.5em_rgba(52,33,13,0.16)] md:min-h-[27.5em] md:p-14"
+      className="grid min-h-[23.75em] items-end overflow-hidden rounded-[1.75em] bg-[linear-gradient(112deg,rgba(20,16,13,0.93)_16%,rgba(20,16,13,0.68)_58%,rgba(20,16,13,0.4)_100%),url('https://raw.githubusercontent.com/pengikut-raja-capybara/sentra-genteng-bogorejo/refs/heads/content/public/assets/uploads/hero.webp')] bg-cover bg-center p-8 text-[#fffef9] shadow-[0_0.875em_2.5em_rgba(52,33,13,0.16)] md:min-h-[27.5em] md:p-14"
     >
       <div className="max-w-[45em] animate-[reveal-up_0.72s_ease-out_both]">
         <p className="inline-flex rounded-full border border-white/45 bg-black/15 [padding:0.25em_0.75em] text-xs uppercase tracking-[0.08em] [text-shadow:0_0.08em_0.24em_rgba(0,0,0,0.45)]">
