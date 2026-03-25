@@ -87,8 +87,8 @@ content:
           label: "Kebutuhan per Meter Persegi (m2)",
           type: string,
         }
-      - { name: prd_harga_pengepul, label: "Harga Jual Pengepul", type: string }
-      - { name: prd_harga_eceran, label: "Harga Jual Eceran", type: string }
+      - { name: prd_harga_grosir, label: "Harga Grosir", type: string }
+      - { name: prd_harga_eceran, label: "Harga Eceran", type: string }
       - {
           name: prd_image,
           label: "Foto",
