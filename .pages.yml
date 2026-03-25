@@ -67,7 +67,7 @@ content:
     path: content/produk
     format: json
     view:
-      fields: [prd_id, prd_image, prd_nama, prd_harga_eceran, prd_kebutuhan_m2]
+      fields: [prd_id, prd_image, prd_nama, prd_harga_grosir, prd_harga_eceran, prd_kebutuhan_m2]
     fields:
       - { name: prd_id, label: ID, type: uuid, options: { editable: false } }
       - {
