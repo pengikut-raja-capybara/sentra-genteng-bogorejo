@@ -22,7 +22,7 @@ export const heroContent: HeroContent = {
 
 export const capacityMetrics: CapacityMetric[] = [
   {
-    label: "Rumah Produksi Terintegrasi",
+    label: "Mitra Produksi Terintegrasi",
     value: "XX+",
     detail: "Jaringan pengrajin aktif dan terkoordinasi",
     symbol: "RMH",

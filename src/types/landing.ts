@@ -27,6 +27,7 @@ export type Product = {
   spec: string
   usage: string
   note: string
+  imageUrl?: string
 }
 
 export type ValuePropositionItem = {
