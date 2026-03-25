@@ -1,73 +1,100 @@
-# React + TypeScript + Vite
+# Sentra Genteng Bogorejo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Landing page profil dan katalog Sentra Genteng Bogorejo berbasis React + Vite dengan integrasi konten dari GitHub CMS.
 
-Currently, two official plugins are available:
+## Tujuan Proyek
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Menampilkan profil sentra produksi genteng secara profesional.
+- Menyediakan katalog produk yang mudah diakses calon pembeli.
+- Mengelola konten produk dan rumah produksi dari repository konten (tanpa ubah kode aplikasi setiap kali update data).
 
-## React Compiler
+## Fitur Utama
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+- Hero, value proposition, dan lead capture section.
+- Showcase Produk dan Rumah Produksi dengan urutan acak serta auto-rotate.
+- Modal detail konten (foto, spesifikasi, kapasitas, informasi tenaga kerja).
+- Perhitungan kapasitas cetak bulanan otomatis dari data rumah produksi CMS.
+- Optimasi build (image optimizer + kompresi aset) untuk performa deploy.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React 19
+- TypeScript
+- Vite 7
+- Tailwind CSS 4
+- GitHub Pages (deployment via GitHub Actions)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Struktur Data CMS (Ringkas)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Sumber konten dibaca dari branch/folder repository konten yang dikonfigurasi lewat environment variable:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Folder produk: `content/produk`
+- Folder rumah produksi: `content/rumah_produksi`
+
+Setiap file konten diparsing oleh utilitas di `src/utils/contentApi.ts` lalu dimapping ke model internal TypeScript di `src/types/content.ts`.
+
+## Environment Setup
+
+### Local Development
+
+1. Copy file `.env.example` menjadi `.env`
+2. Isi value sesuai kebutuhan:
+
+```env
+VITE_CONTENT_GITHUB_OWNER=pengikut-raja-capybara
+VITE_CONTENT_GITHUB_REPO=sentra-genteng-bogorejo
+VITE_CONTENT_GITHUB_BRANCH=content
+VITE_CONTENT_BASE_PATH=content
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Menjalankan Proyek
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Install dependency:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+bun install
 ```
+
+Jalankan mode development:
+
+```bash
+bun run dev
+```
+
+Build production:
+
+```bash
+bun run build
+```
+
+Preview hasil build:
+
+```bash
+bun run preview
+```
+
+## Deployment
+
+Deploy menggunakan GitHub Actions workflow di `.github/workflows/deploy.yml`.
+
+Workflow akan:
+
+1. Install dependency via Bun
+2. Build aplikasi
+3. Publish folder `dist` ke branch `gh-pages`
+
+### GitHub Repository Variables
+
+Tambahkan variable berikut di repository (Settings > Secrets and variables > Actions > Variables):
+
+- `VITE_CONTENT_GITHUB_OWNER`
+- `VITE_CONTENT_GITHUB_REPO`
+- `VITE_CONTENT_GITHUB_BRANCH`
+- `VITE_CONTENT_BASE_PATH`
+
+Jika belum diisi, workflow menggunakan default yang sama seperti `.env.example`.
+
+## Catatan
+
+- File `.env` sudah di-ignore oleh Git.
+- Konten yang tidak terbaca dari CMS akan fallback ke data lokal di `src/data/landingData.ts`.
