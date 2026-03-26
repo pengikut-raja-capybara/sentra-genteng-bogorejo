@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ProductContent } from '../types/content'
-import { resolveContentAssetUrl } from '../utils/contentApi'
 import { ContentDetailModal } from './ContentDetailModal'
+import { CdnImage } from './CdnImage'
 
 type ProductCatalogSectionProps = {
   products: ProductContent[]
@@ -31,9 +31,7 @@ const formatProductPrice = (wholesalePrice: string, retailPrice: string) => {
 }
 
 const getProductImageUrls = (product: ProductContent) => {
-  return product.images
-    .filter((path) => path.trim().length > 0)
-    .map((path) => resolveContentAssetUrl(path))
+  return product.images.filter((path) => path.trim().length > 0)
 }
 
 const formatDetailSpec = (spec: string) => {
@@ -176,8 +174,8 @@ export function ProductCatalogSection({
             >
               <div className="relative overflow-hidden">
                 {product.images[0] ? (
-                  <img
-                    src={resolveContentAssetUrl(product.images[0])}
+                  <CdnImage
+                    src={product.images[0]}
                     alt={normalizeText(product.name)}
                     loading="lazy"
                     className="block h-40 w-full object-cover transition duration-500 group-hover:scale-105"
@@ -233,7 +231,7 @@ export function ProductCatalogSection({
         leftPanel={
           <div className="relative h-full bg-[#2c1b12]">
             {activeImageUrl ? (
-              <img
+              <CdnImage
                 src={activeImageUrl}
                 alt={normalizeText(activeProduct?.name ?? '')}
                 className="h-full w-full object-contain"
@@ -257,7 +255,7 @@ export function ProductCatalogSection({
                         : 'border-[#d9c5a6] hover:border-[#c89e76]'
                     }`}
                   >
-                    <img
+                    <CdnImage
                       src={imageUrl}
                       alt={`Gambar ${normalizeText(activeProduct?.name ?? '')}`}
                       className="h-14 w-full object-cover"

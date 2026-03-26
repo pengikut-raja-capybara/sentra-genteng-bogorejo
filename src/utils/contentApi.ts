@@ -8,6 +8,10 @@ const GITHUB_BASE_PATH = import.meta.env.VITE_CONTENT_BASE_PATH ?? "content";
 const PRODUCT_FOLDER = "produk";
 const PRODUCTION_HOUSE_FOLDER = "rumah_produksi";
 const LATEST_REF_CACHE_TTL_MS = 60 * 1000;
+const CONTENT_IMAGE_PROXY = import.meta.env.VITE_CONTENT_IMAGE_PROXY ?? "weserv";
+const CONTENT_IMAGE_QUALITY = Number(import.meta.env.VITE_CONTENT_IMAGE_QUALITY ?? "75");
+const CONTENT_IMAGE_WIDTH = Number(import.meta.env.VITE_CONTENT_IMAGE_WIDTH ?? "0");
+const SIMULATE_ALL_CDN_DOWN = import.meta.env.VITE_SIMULATE_ALL_CDN_DOWN === "true";
 
 let latestContentRefCache: {
   ref: string;
@@ -28,6 +32,12 @@ type GitHubBranchResponse = {
   commit: {
     sha: string;
   };
+};
+
+type GitHubContentFileResponse = {
+  type: "file" | "dir";
+  content?: string;
+  encoding?: string;
 };
 
 type CmsProductContent = {
@@ -82,17 +92,93 @@ const buildJsDelivrFlatApiUrl = (ref: string = GITHUB_BRANCH) => {
   return `https://data.jsdelivr.com/v1/package/gh/${GITHUB_OWNER}/${GITHUB_REPO}@${encodeURIComponent(ref)}/flat`;
 };
 
+const isAbsoluteHttpUrl = (value: string) => {
+  return value.startsWith("http://") || value.startsWith("https://");
+};
+
+const CDN_HOSTS = new Set([
+  "cdn.jsdelivr.net",
+  "data.jsdelivr.com",
+  "raw.githubusercontent.com",
+  "images.weserv.nl",
+  "cdn.statically.io",
+]);
+
+const isCdnUrl = (url: string): boolean => {
+  try {
+    const parsedUrl = new URL(url);
+    return CDN_HOSTS.has(parsedUrl.host);
+  } catch {
+    return false;
+  }
+};
+
+const decodeBase64Utf8 = (base64Value: string): string => {
+  const normalized = base64Value.replace(/\s+/g, "");
+  const binaryValue = atob(normalized);
+  const bytes = Uint8Array.from(binaryValue, (char) => char.charCodeAt(0));
+
+  return new TextDecoder().decode(bytes);
+};
+
+const buildWeservUrl = (sourceUrl: string): string => {
+  const parsed = new URL(sourceUrl);
+  const weservSource = `${parsed.protocol === "https:" ? "ssl:" : ""}${parsed.host}${parsed.pathname}${parsed.search}`;
+  const params = new URLSearchParams({
+    url: weservSource,
+    q: Number.isFinite(CONTENT_IMAGE_QUALITY) ? String(CONTENT_IMAGE_QUALITY) : "75",
+    output: "webp",
+  });
+
+  if (Number.isFinite(CONTENT_IMAGE_WIDTH) && CONTENT_IMAGE_WIDTH > 0) {
+    params.set("w", String(CONTENT_IMAGE_WIDTH));
+  }
+
+  return `https://images.weserv.nl/?${params.toString()}`;
+};
+
+const buildStaticallyUrl = (sourceUrl: string): string => {
+  const normalizedSource = sourceUrl.replace(/^https?:\/\//, "");
+  const params = new URLSearchParams({
+    quality: Number.isFinite(CONTENT_IMAGE_QUALITY) ? String(CONTENT_IMAGE_QUALITY) : "75",
+    f: "auto",
+  });
+
+  return `https://cdn.statically.io/img/${encodeURIComponent(normalizedSource)}?${params.toString()}`;
+};
+
+const toOptimizedImageUrl = (sourceUrl: string): string => {
+  try {
+    if (CONTENT_IMAGE_PROXY === "none") {
+      return sourceUrl;
+    }
+
+    if (CONTENT_IMAGE_PROXY === "statically") {
+      return buildStaticallyUrl(sourceUrl);
+    }
+
+    return buildWeservUrl(sourceUrl);
+  } catch (error) {
+    console.warn("Failed to build optimized image URL, fallback to source URL", error);
+    return sourceUrl;
+  }
+};
+
 export const resolveContentAssetUrl = (assetPath: string): string => {
   const trimmedPath = assetPath.trim();
 
-  if (trimmedPath.startsWith("http://") || trimmedPath.startsWith("https://")) {
-    return trimmedPath;
+  if (trimmedPath.length === 0) {
+    return "";
   }
 
-  const normalized = trimmedPath.replace(/^\/+/, "");
-  const prefixedPath = normalized.startsWith("assets/") ? `public/${normalized}` : normalized;
+  if (!isAbsoluteHttpUrl(trimmedPath)) {
+    const normalized = trimmedPath.replace(/^\/+/, "");
+    const prefixedPath = normalized.startsWith("assets/") ? `public/${normalized}` : normalized;
 
-  return buildRawUrl(prefixedPath);
+    return toOptimizedImageUrl(buildRawUrl(prefixedPath));
+  }
+
+  return toOptimizedImageUrl(trimmedPath);
 };
 
 const parseJsonContent = <T>(rawText: string, sourcePath: string): T => {
@@ -104,6 +190,10 @@ const parseJsonContent = <T>(rawText: string, sourcePath: string): T => {
 };
 
 const fetchJson = async <T>(url: string): Promise<T> => {
+  if (SIMULATE_ALL_CDN_DOWN && isCdnUrl(url)) {
+    throw new Error(`Simulated CDN outage for ${url}`);
+  }
+
   const response = await fetch(url);
 
   if (!response.ok) {
@@ -114,6 +204,10 @@ const fetchJson = async <T>(url: string): Promise<T> => {
 };
 
 const fetchText = async (url: string): Promise<string> => {
+  if (SIMULATE_ALL_CDN_DOWN && isCdnUrl(url)) {
+    throw new Error(`Simulated CDN outage for ${url}`);
+  }
+
   const response = await fetch(url);
 
   if (!response.ok) {
@@ -208,8 +302,21 @@ const getDetailByRawPath = async <T>(path: string): Promise<T> => {
   } catch (error) {
     console.warn("Failed to fetch detail from jsDelivr, fallback to GitHub raw", error);
 
-    const rawText = await fetchText(buildGitHubRawUrl(path, latestRef));
-    return parseJsonContent<T>(rawText, path);
+    try {
+      const rawText = await fetchText(buildGitHubRawUrl(path, latestRef));
+      return parseJsonContent<T>(rawText, path);
+    } catch (rawError) {
+      console.warn("Failed to fetch detail from GitHub raw, fallback to GitHub Contents API", rawError);
+
+      const fileResponse = await fetchJson<GitHubContentFileResponse>(buildContentsApiUrl(path));
+
+      if (fileResponse.type !== "file" || fileResponse.encoding !== "base64" || !fileResponse.content) {
+        throw new Error(`Invalid GitHub Contents API response for ${path}`);
+      }
+
+      const rawText = decodeBase64Utf8(fileResponse.content);
+      return parseJsonContent<T>(rawText, path);
+    }
   }
 };
 

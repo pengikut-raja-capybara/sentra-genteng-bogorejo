@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ProductionHouseContent } from '../types/content'
-import { resolveContentAssetUrl } from '../utils/contentApi'
 import { ContentDetailModal } from './ContentDetailModal'
+import { CdnImage } from './CdnImage'
 
 type ProductionHouseSectionProps = {
   productionHouses: ProductionHouseContent[]
@@ -22,9 +22,7 @@ const shuffleItems = <T,>(items: T[]): T[] => {
 }
 
 const getProductionHousePhotoUrls = (item: ProductionHouseContent) => {
-  return item.photos
-    .filter((path) => path.trim().length > 0)
-    .map((path) => resolveContentAssetUrl(path))
+  return item.photos.filter((path) => path.trim().length > 0)
 }
 
 const ProductionHouseSkeletonCard = ({ index }: { index: number }) => {
@@ -132,8 +130,8 @@ export function ProductionHouseSection({
             >
               <div className="relative overflow-hidden">
                 {item.photos[0] ? (
-                  <img
-                    src={resolveContentAssetUrl(item.photos[0])}
+                  <CdnImage
+                    src={item.photos[0]}
                     alt={normalizeText(item.name)}
                     loading="lazy"
                     className="block h-48 w-full object-cover transition duration-500 group-hover:scale-105"
@@ -191,7 +189,7 @@ export function ProductionHouseSection({
         leftPanel={
           <div className="relative h-full bg-[#2c1b12]">
             {activeImageUrl ? (
-              <img
+              <CdnImage
                 src={activeImageUrl}
                 alt={normalizeText(activeProductionHouse?.name ?? '')}
                 className="h-full w-full object-contain"
@@ -215,7 +213,7 @@ export function ProductionHouseSection({
                         : 'border-[#d9c5a6] hover:border-[#c89e76]'
                     }`}
                   >
-                    <img
+                    <CdnImage
                       src={imageUrl}
                       alt={`Foto ${normalizeText(activeProductionHouse?.name ?? '')}`}
                       className="h-14 w-full object-cover"
