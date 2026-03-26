@@ -175,7 +175,7 @@ function App() {
 
       <main className="mt-5 space-y-5">
         <HeroSection content={heroContent} contactInfo={contactInfo} />
-        <section id="kapasitas">
+        <section id="kapasitas" className="space-y-5">
           <CapacitySection
             metrics={capacityMetrics}
             description={capacityDescription}
