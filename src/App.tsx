@@ -18,7 +18,6 @@ import {
   heroContent,
   capacityMetrics as fallbackCapacityMetrics,
   capacityDescription,
-  products as fallbackProducts,
   valuePropositions,
   contactInfo,
   contactDescription,
@@ -89,24 +88,6 @@ const summarizeMonthlyMoldingCapacity = (productionHouses: ProductionHouseConten
   return `${formatNumberId(totals.min)}-${formatNumberId(totals.max)}`
 }
 
-const mapFallbackProductToProductContent = (
-  item: (typeof fallbackProducts)[number],
-  index: number,
-): ProductContent => {
-  const spec = normalizeText(item.spec)
-  const usage = normalizeText(item.usage).replace(/^Kebutuhan:\s*/i, '')
-
-  return {
-    id: `fallback-${index + 1}`,
-    name: normalizeText(item.name),
-    specification: spec,
-    usagePerSquareMeter: usage,
-    wholesalePrice: '-',
-    retailPrice: '-',
-    images: [],
-  }
-}
-
 const mapCapacityWithProductionHouseCount = (
   baseMetrics: CapacityMetric[],
   productionHouseCount: number,
@@ -134,12 +115,12 @@ const mapCapacityWithProductionHouseCount = (
 }
 
 function App() {
-  const [products, setProducts] = useState<ProductContent[]>(
-    fallbackProducts.map(mapFallbackProductToProductContent),
-  )
+  const [products, setProducts] = useState<ProductContent[]>([])
   const [capacityMetrics, setCapacityMetrics] =
     useState<CapacityMetric[]>(fallbackCapacityMetrics)
   const [productionHouses, setProductionHouses] = useState<ProductionHouseContent[]>([])
+  const [isProductsLoading, setIsProductsLoading] = useState(true)
+  const [isProductionHousesLoading, setIsProductionHousesLoading] = useState(true)
 
   useEffect(() => {
     let active = true
@@ -173,6 +154,11 @@ function App() {
         }
       } catch (error) {
         console.error('Failed to load content from GitHub CMS, using local fallback.', error)
+      } finally {
+        if (active) {
+          setIsProductsLoading(false)
+          setIsProductionHousesLoading(false)
+        }
       }
     }
 
@@ -193,10 +179,14 @@ function App() {
           metrics={capacityMetrics}
           description={capacityDescription}
         />
-        <ProductionHouseSection productionHouses={productionHouses} />
+        <ProductionHouseSection
+          productionHouses={productionHouses}
+          isLoading={isProductionHousesLoading}
+        />
         <ProductCatalogSection
           products={products}
           whatsappLink={contactInfo.whatsappLink}
+          isLoading={isProductsLoading}
         />
         <ValuePropositionSection items={valuePropositions} />
         <LeadCaptureSection

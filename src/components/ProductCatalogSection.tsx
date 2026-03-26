@@ -6,6 +6,7 @@ import { ContentDetailModal } from './ContentDetailModal'
 type ProductCatalogSectionProps = {
   products: ProductContent[]
   whatsappLink: string
+  isLoading?: boolean
 }
 
 const normalizeText = (value: string) => value.replace(/\s+/g, ' ').trim()
@@ -57,7 +58,30 @@ const buildWhatsAppSummary = (product: ProductContent) => {
   ].join('\n')
 }
 
-export function ProductCatalogSection({ products, whatsappLink }: ProductCatalogSectionProps) {
+const ProductCatalogSkeletonCard = ({ index }: { index: number }) => {
+  return (
+    <article
+      className="w-full max-w-[22.5em] overflow-hidden rounded-2xl border border-[#dccdb8] bg-white shadow-[0_0.5em_1.25em_rgba(52,33,13,0.08)] sm:w-[calc(50%-0.7em)] lg:w-[calc(33.333%-0.9em)]"
+      aria-hidden="true"
+      style={{ animationDelay: `${index * 120}ms` }}
+    >
+      <div className="h-40 w-full animate-pulse bg-[#f2e6d5]" />
+      <div className="space-y-3 p-4">
+        <div className="h-6 w-2/3 animate-pulse rounded bg-[#efe2d0]" />
+        <div className="h-4 w-full animate-pulse rounded bg-[#f3e9db]" />
+        <div className="h-4 w-11/12 animate-pulse rounded bg-[#f3e9db]" />
+        <div className="h-4 w-10/12 animate-pulse rounded bg-[#f3e9db]" />
+        <div className="h-8 w-full animate-pulse rounded-lg bg-[#efe2d0]" />
+      </div>
+    </article>
+  )
+}
+
+export function ProductCatalogSection({
+  products,
+  whatsappLink,
+  isLoading = false,
+}: ProductCatalogSectionProps) {
   const [activeProductId, setActiveProductId] = useState<string | null>(null)
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null)
   const [shuffledProducts, setShuffledProducts] = useState<ProductContent[]>(() =>
@@ -135,11 +159,17 @@ export function ProductCatalogSection({ products, whatsappLink }: ProductCatalog
               Katalog Produk Kami
             </h2>
           </div>
-          <p className="text-sm font-semibold text-[#6b5f55]">{products.length} produk aktif</p>
+          <p className="text-sm font-semibold text-[#6b5f55]">
+            {isLoading ? 'Memuat katalog produk...' : `${products.length} produk aktif`}
+          </p>
         </div>
 
         <div className="mt-6 flex flex-wrap justify-center gap-5">
-          {shuffledProducts.map((product) => (
+          {isLoading
+            ? Array.from({ length: 3 }).map((_, index) => (
+                <ProductCatalogSkeletonCard key={`product-skeleton-${index}`} index={index} />
+              ))
+            : shuffledProducts.map((product) => (
             <article
               key={product.id}
               className="group w-full max-w-[22.5em] overflow-hidden rounded-2xl border border-[#dccdb8] bg-white shadow-[0_0.5em_1.25em_rgba(52,33,13,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_1em_2em_rgba(52,33,13,0.15)] sm:w-[calc(50%-0.7em)] lg:w-[calc(33.333%-0.9em)]"
@@ -186,6 +216,12 @@ export function ProductCatalogSection({ products, whatsappLink }: ProductCatalog
               </div>
             </article>
           ))}
+
+          {!isLoading && shuffledProducts.length === 0 ? (
+            <p className="w-full rounded-2xl border border-[#e6d4bf] bg-[#fff8ed] p-4 text-center text-sm text-[#6b5f55]">
+              Data produk belum tersedia.
+            </p>
+          ) : null}
         </div>
       </section>
 

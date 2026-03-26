@@ -5,6 +5,7 @@ import { ContentDetailModal } from './ContentDetailModal'
 
 type ProductionHouseSectionProps = {
   productionHouses: ProductionHouseContent[]
+  isLoading?: boolean
 }
 
 const normalizeText = (value: string) => value.replace(/\s+/g, ' ').trim()
@@ -26,7 +27,27 @@ const getProductionHousePhotoUrls = (item: ProductionHouseContent) => {
     .map((path) => resolveContentAssetUrl(path))
 }
 
-export function ProductionHouseSection({ productionHouses }: ProductionHouseSectionProps) {
+const ProductionHouseSkeletonCard = ({ index }: { index: number }) => {
+  return (
+    <article
+      className="w-full max-w-[32em] overflow-hidden rounded-2xl border border-[#dccdb8] bg-white shadow-[0_0.5em_1.25em_rgba(52,33,13,0.08)] md:w-[calc(50%-0.7em)]"
+      aria-hidden="true"
+      style={{ animationDelay: `${index * 120}ms` }}
+    >
+      <div className="h-48 w-full animate-pulse bg-[#f2e6d5]" />
+      <div className="space-y-2 p-4">
+        <div className="h-6 w-2/3 animate-pulse rounded bg-[#efe2d0]" />
+        <div className="h-4 w-5/6 animate-pulse rounded bg-[#f3e9db]" />
+        <div className="h-16 w-full animate-pulse rounded-lg bg-[#efe2d0]" />
+      </div>
+    </article>
+  )
+}
+
+export function ProductionHouseSection({
+  productionHouses,
+  isLoading = false,
+}: ProductionHouseSectionProps) {
   const [activeProductionHouseId, setActiveProductionHouseId] = useState<string | null>(null)
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null)
   const [shuffledProductionHouses, setShuffledProductionHouses] = useState<
@@ -79,10 +100,6 @@ export function ProductionHouseSection({ productionHouses }: ProductionHouseSect
     setSelectedImageUrl(null)
   }
 
-  if (productionHouses.length === 0) {
-    return null
-  }
-
   return (
     <>
       <section
@@ -98,11 +115,17 @@ export function ProductionHouseSection({ productionHouses }: ProductionHouseSect
               Mitra Produksi Kami
             </h2>
           </div>
-          <p className="text-sm font-semibold text-[#6b5f55]">{productionHouses.length} mitra aktif</p>
+          <p className="text-sm font-semibold text-[#6b5f55]">
+            {isLoading ? 'Memuat data mitra produksi...' : `${productionHouses.length} mitra aktif`}
+          </p>
         </div>
 
         <div className="mt-6 flex flex-wrap justify-center gap-5">
-          {shuffledProductionHouses.map((item) => (
+          {isLoading
+            ? Array.from({ length: 2 }).map((_, index) => (
+                <ProductionHouseSkeletonCard key={`production-house-skeleton-${index}`} index={index} />
+              ))
+            : shuffledProductionHouses.map((item) => (
             <article
               key={item.id}
               className="group w-full max-w-[32em] overflow-hidden rounded-2xl border border-[#dccdb8] bg-white shadow-[0_0.5em_1.25em_rgba(52,33,13,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_1em_2em_rgba(52,33,13,0.15)] md:w-[calc(50%-0.7em)]"
@@ -144,11 +167,17 @@ export function ProductionHouseSection({ productionHouses }: ProductionHouseSect
                   onClick={() => openDetail(item.id)}
                   className="rounded-full border border-[#d7b48f] bg-[#fff4e2] [padding:0.35em_0.9em] text-xs font-semibold text-[#7a3a10] transition hover:bg-[#ffe8c9]"
                 >
-                  Lihat Detail Rumah Produksi
+                  Lihat Detail
                 </button>
               </div>
             </article>
           ))}
+
+          {!isLoading && shuffledProductionHouses.length === 0 ? (
+            <p className="w-full rounded-2xl border border-[#e6d4bf] bg-[#fff8ed] p-4 text-center text-sm text-[#6b5f55]">
+              Data mitra produksi belum tersedia.
+            </p>
+          ) : null}
         </div>
       </section>
 
