@@ -175,24 +175,30 @@ function App() {
 
       <main className="mt-5 space-y-5">
         <HeroSection content={heroContent} contactInfo={contactInfo} />
-        <CapacitySection
-          metrics={capacityMetrics}
-          description={capacityDescription}
-        />
-        <ProductionHouseSection
-          productionHouses={productionHouses}
-          isLoading={isProductionHousesLoading}
-        />
-        <ProductCatalogSection
-          products={products}
-          whatsappLink={contactInfo.whatsappLink}
-          isLoading={isProductsLoading}
-        />
+        <section id="kapasitas">
+          <CapacitySection
+            metrics={capacityMetrics}
+            description={capacityDescription}
+          />
+          <ProductionHouseSection
+            productionHouses={productionHouses}
+            isLoading={isProductionHousesLoading}
+          />
+        </section>
+        <section id="katalog">
+          <ProductCatalogSection
+            products={products}
+            whatsappLink={contactInfo.whatsappLink}
+            isLoading={isProductsLoading}
+          />
+        </section>
         <ValuePropositionSection items={valuePropositions} />
-        <LeadCaptureSection
-          contactInfo={contactInfo}
-          description={contactDescription}
-        />
+        <section id="kontak">
+          <LeadCaptureSection
+            contactInfo={contactInfo}
+            description={contactDescription}
+          />
+        </section>
       </main>
 
       <FooterSection
