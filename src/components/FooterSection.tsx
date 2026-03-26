@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { CreatorCredit } from "../types/landing";
+import logo from "../assets/images/logo.png";
 
 type FooterSectionProps = {
   text: string;
@@ -37,6 +38,15 @@ export function FooterSection({ text, keywords, creditPrefix, creditLabel, creat
   return (
     <>
       <footer className="mt-5 rounded-2xl bg-[#221d1a] p-4 text-[#fff9f0]">
+        <div className="flex items-center gap-3 mb-3">
+          <img
+            src={logo}
+            alt="Sentra Genteng Bogorejo Logo"
+            className="h-8 w-auto"
+            loading="lazy"
+          />
+          <span className="font-['Bitter'] font-semibold text-sm">Sentra Genteng Bogorejo</span>
+        </div>
         <p>{text}</p>
         <p className="mt-2 text-sm text-[#f0d7b8]">{keywords}</p>
         <p className="mt-3 text-sm text-[#f4eadc]">
