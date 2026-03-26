@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
+import logo from '../assets/images/logo.png'
 
 type ContentDetailModalProps = {
   isOpen: boolean
@@ -64,7 +65,18 @@ export function ContentDetailModal({
         <div
           className={`grid h-full grid-cols-1 grid-rows-[46vh_minmax(0,1fr)] lg:grid-rows-1 ${layoutClassName}`}
         >
-          {leftPanel}
+          <div className="relative">
+            {leftPanel}
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 px-2 py-1 rounded-lg bg-white/40 backdrop-blur-md border border-white/50">
+              <img
+                src={logo}
+                alt="Sentra Genteng Bogorejo"
+                className="h-6 w-auto"
+                loading="lazy"
+              />
+              <span className="text-[10px] font-semibold text-[#241c16] leading-none">Sentra Genteng Bogorejo</span>
+            </div>
+          </div>
           {rightPanel}
         </div>
       </div>
