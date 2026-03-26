@@ -10,7 +10,7 @@ const PRODUCTION_HOUSE_FOLDER = "rumah_produksi";
 const LATEST_REF_CACHE_TTL_MS = 60 * 1000;
 const CONTENT_IMAGE_PROXY = import.meta.env.VITE_CONTENT_IMAGE_PROXY ?? "weserv";
 const CONTENT_IMAGE_QUALITY = Number(import.meta.env.VITE_CONTENT_IMAGE_QUALITY ?? "75");
-const CONTENT_IMAGE_WIDTH = Number(import.meta.env.VITE_CONTENT_IMAGE_WIDTH ?? "0");
+const CONTENT_IMAGE_WIDTH = Number(import.meta.env.VITE_CONTENT_IMAGE_WIDTH ?? "1200");
 const SIMULATE_ALL_CDN_DOWN = import.meta.env.VITE_SIMULATE_ALL_CDN_DOWN === "true";
 
 let latestContentRefCache: {
